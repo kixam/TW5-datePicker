@@ -1,0 +1,7 @@
+title: Installation
+
+Just drag and drop [[moment.js|$:/plugins/kixam/moment]] and [[DatePicker|$:/plugins/kixam/datepicker]] plugins from the [[Plugins|$:/core/ui/ControlPanel/Plugins]] list into your [[TiddlyWiki|http://tiddlywiki.com/#TiddlyWiki]].
+
+The plugin was tested with all the locales listed in the Languages section below.
+
+{{$:/core/ui/ControlPanel/Plugins}}
