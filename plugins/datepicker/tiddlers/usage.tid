@@ -1,0 +1,11 @@
+title: $:/plugins/kixam/datepicker/usage
+
+`<$datepicker />`
+
+!! attributes
+All attributes are optional.
+
+|!Attribute|!Purpose|!Default value|
+|`tiddler`|Edited tiddler|//current tiddler//|
+|`field`|Edited field|`created`|
+|`format`|Date format|//undefined//|
