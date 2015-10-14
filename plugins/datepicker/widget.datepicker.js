@@ -7,6 +7,12 @@ module-type: widget
 
   For full help see $:/plugins/kixam/datepicker/usage
 
+  TODO: save date in standard TW5 format ultimately (YYYYMMDDHHmmssSSS), while showing/editing date in user's format
+    (partially done: we use one format for pikaday, and another to actually save the date. still need to change input widget edition handling)
+  FIXME: pikaday cannot detect moment.js
+  TODO: use HTML5 "date" (and not "datetime-local") input types if available
+  TODO: set field type/flag to "date" to make TW5 render {{!!ourField}} as expected, i.e. like it renders e.g. {{!!created}}
+  TODO: use our widget for system date fields (created, modified, ...)
 \*/
 
 /*jslint node: true, browser: true */
@@ -16,66 +22,138 @@ module-type: widget
   'use strict';
 
   var Widget = require("$:/core/modules/widgets/widget.js").widget;
-  var utils = require("$:/plugins/kixam/datepicker/widget.utils.js");
   var moment = require("$:/plugins/kixam/moment/moment.js");
-  if(typeof window !== 'undefined' && typeof window.moment !== 'function') {
-    window.moment = moment;
-  }
-  var pikaday = require("$:/plugins/kixam/datepicker/pikaday.js");
+  var pikaday = require("$:/plugins/kixam/datepicker/pikaday.js"); // this is a modified version of pikaday.js, see build.sh
 
-  var DatePickerWidget = function(parseTreeNode,options) {
+  var DatePickerWidget = function(parseTreeNode, options) {
     Widget.call(this);
-    this.initialise(parseTreeNode,options);
+    this.initialise(parseTreeNode, options);
   };
 
   DatePickerWidget.prototype = new Widget();
 
   DatePickerWidget.prototype.render = function(parent,nextSibling) {
-    this.parentDomNode = parent;
     this.computeAttributes();
-    this.tiddler = $tw.wiki.getTiddler(this.getVariable("currentTiddler"));
+    this.renderChildren(parent,nextSibling);
+    this.execute();
+    this.parentDomNode = parent;
+    this.saveFormat = "YYYYMMDDHHmmssSSS";
 
-    var attrParseWorked = this.execute();
-    if (attrParseWorked === undefined) {
-      this.holder = $tw.utils.domMaker("input", {type: "text", id:"test", attributes:{style: "position: relative;"}});
-      parent.insertBefore(this.holder,nextSibling);
-      this.domNodes.push(this.holder);
-      this.picker = new pikaday({ field: this.holder });
+    // Choose the appropriate edit widget
+    this.editor = $tw.utils.domMaker("input", {type: "date"});
+    this.editorType = this.editor.type;
+    parent.insertBefore(this.editor, nextSibling);
+    this.domNodes.push(this.editor);
 
-    } else {
-      utils.dispError(this.parseTreeNode.type+": Unexpected attribute(s) "+attrParseWorked.join(", "));
-      this.refresh = function() {}; // disable refresh of this as it won't work with incorrect attributes
-    }
+    this.onPickerDateSelect = this.onPickerDateSelect.bind(this);
+    this.picker = new pikaday({
+      field: this.editor,
+      format: this.editFormat,
+      onSelect: this.onPickerDateSelect
+    });
+    this.refreshSelf();
   };
 
   DatePickerWidget.prototype.execute = function() {
-    var attrParseWorked = utils.parseWidgetAttributes(this, {
-           tiddler:{ type: "string", defaultValue: undefined},
-           field:  { type: "string", defaultValue: "created"},
-           format: { type: "string", defaultValue: undefined},
-           });
-
-    if ((attrParseWorked === undefined) && (this.filter)) {
-      this.compiledFilter = this.wiki.compileFilter(this.filter);
-    }
-
-    return attrParseWorked;
+    // Get our parameters
+    this.editFormat = this.getAttribute("format", "YYYY-MM-DD");
+    this.editTitle = this.getAttribute("tiddler", this.getVariable("currentTiddler"));
+    this.editField = this.getAttribute("field","created");
+    this.editIndex = this.getAttribute("index");
+    this.editClass = this.getAttribute("class");
+    this.editPlaceholder = this.getAttribute("placeholder");
   };
 
-  /*
-     Selectively refreshes the widget if needed. Returns true if the widget or any of its children needed re-rendering
-     */
+  // Selectively refreshes the widget if needed. Returns true if the widget or any of its children needed re-rendering
   DatePickerWidget.prototype.refresh = function(changedTiddlers) {
     var changedAttributes = this.computeAttributes();
-    if(changedAttributes.tiddler
-    || changedAttributes.format
-    || changedAttributes.field) {
+    // Refresh if an attribute has changed, or the type associated with the target tiddler has changed
+    if(changedAttributes.tiddler || changedAttributes.field || changedAttributes.index || changedTiddlers[this.editTitle]) {
       this.refreshSelf();
       return true;
+    } else {
+      return this.refreshChildren(changedTiddlers);
     }
   };
 
-  exports.datepicker = DatePickerWidget;
-
+  DatePickerWidget.prototype.refreshSelf = function() {
+    var val = moment(this.getEditInfo().value, this.saveFormat);
+    if(val.isValid()) {
+      val = val.format(this.editFormat);
+      this.editor.value = val;
+      this.picker.setDate(val);
+    }
   }
-  ());
+
+  DatePickerWidget.prototype.onPickerDateSelect = function() {
+    this.saveChanges(moment(this.picker.toString(), this.editFormat).format(this.saveFormat));
+    // this.picker.setDate(moment(this.editor.value, this.saveFormat).format(this.editFormat));
+  };
+
+// ---------------------------------------------------------- //
+// --- inspired from $:/core/modules/widgets/edit-text.js --- //
+// ---------------------------------------------------------- //
+
+  DatePickerWidget.prototype.saveChanges = function(text) {
+    var editInfo = this.getEditInfo();
+    if(text !== editInfo.value) {
+        editInfo.update(text);
+    }
+  };
+
+  DatePickerWidget.prototype.getEditInfo = function() {
+    // Get the edit value
+    var self = this,
+        value,
+        update;
+    if(this.editIndex) {
+        value = this.wiki.extractTiddlerDataItem(this.editTitle,this.editIndex,this.editDefault);
+        update = function(value) {
+            var data = self.wiki.getTiddlerData(self.editTitle,{});
+            if(data[self.editIndex] !== value) {
+                data[self.editIndex] = value;
+                self.wiki.setTiddlerData(self.editTitle,data);
+            }
+        };
+    } else {
+        // Get the current tiddler and the field name
+        var tiddler = this.wiki.getTiddler(this.editTitle);
+        if(tiddler) {
+            // If we've got a tiddler, the value to display is the field string value
+            value = tiddler.getFieldString(this.editField);
+        } else {
+            // Otherwise, we need to construct a default value for the editor
+            switch(this.editField) {
+                case "text":
+                    value = "Type the text for the tiddler '" + this.editTitle + "'";
+                    break;
+                case "title":
+                    value = this.editTitle;
+                    break;
+                default:
+                    value = "";
+                    break;
+            }
+            if(this.editDefault !== undefined) {
+                value = this.editDefault;
+            }
+        }
+        update = function(value) {
+            var tiddler = self.wiki.getTiddler(self.editTitle),
+                updateFields = {
+                    title: self.editTitle
+                };
+            updateFields[self.editField] = value;
+            self.wiki.addTiddler(new $tw.Tiddler(self.wiki.getCreationFields(),tiddler,updateFields,self.wiki.getModificationFields()));
+        };
+    }
+    return {value: value, update: update};
+  };
+
+// ---------------------------------------------------------- //
+// ---------------------------------------------------------- //
+// ---------------------------------------------------------- //
+
+  exports["edit-date"] = DatePickerWidget;
+}
+());

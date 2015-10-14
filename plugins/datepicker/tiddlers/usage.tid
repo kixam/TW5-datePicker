@@ -1,6 +1,8 @@
 title: $:/plugins/kixam/datepicker/usage
 
-`<$datepicker />`
+`<$edit-date>`
+
+This plugin can only pick days, not times.
 
 !! attributes
 All attributes are optional.
@@ -8,4 +10,4 @@ All attributes are optional.
 |!Attribute|!Purpose|!Default value|
 |`tiddler`|Edited tiddler|//current tiddler//|
 |`field`|Edited field|`created`|
-|`format`|Date format|//undefined//|
+|`format`|Date format, in [[moment.js|http://momentjs.com]]'s [[parse+string format|http://momentjs.com/docs/#/parsing/string-format/]]|`YYYY-MM-DD`|

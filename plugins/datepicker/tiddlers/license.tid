@@ -1,6 +1,6 @@
 title: $:/plugins/kixam/datepicker/license
 
-!! ~Pikaday licence: [[MIT|http://mit-license.org/]]
+!! Pikaday licence: [[BSD 2-clause simplified license|http://www.freebsd.org/copyright/freebsd-license.html]] and [[MIT|http://mit-license.org/]]
 ```
 Copyright (c) 2014 David Bushell BSD & MIT license
 

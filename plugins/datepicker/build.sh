@@ -1,5 +1,5 @@
 #!/bin/bash
-# this script will compile the vis library into a tw-plugin
+# this script will compile the pikaday library into a tw-plugin
 # it is largely adapted from felixhayashi's TW5-Vis.js build.sh script
 
 #####################################################################
@@ -34,7 +34,7 @@ printf "minify and copy styles...\n"
 # header
 header=\
 'title: '${pluginPrefix}/pikaday.css'
-type: text/vnd.tiddlywiki
+type: text/css
 tags: $:/tags/Stylesheet'
 
 # uglifyied content; redirect stdin so its not closed by npm command
@@ -69,6 +69,8 @@ while IFS='' read -r line || [[ -n $line ]]; do
     echo "${BASH_REMATCH[1]} window.document.${BASH_REMATCH[2]}" >> $distPath/$targetjs
   elif [[ "$line" =~ ^(.*)sto\((.*)$ ]] ; then
     echo "${BASH_REMATCH[1]}window.setTimeout(${BASH_REMATCH[2]}" >> $distPath/$targetjs
+  elif [[ "$line" =~ ^(.*)require\(\'moment(.*)$ ]] ; then
+    echo "${BASH_REMATCH[1]}require('$:/plugins/kixam/moment/moment.js${BASH_REMATCH[2]}" >> $distPath/$targetjs
   else
     echo "$line" >> $distPath/$targetjs
   fi
