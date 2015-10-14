@@ -7,9 +7,6 @@ module-type: widget
 
   For full help see $:/plugins/kixam/datepicker/usage
 
-  TODO: save date in standard TW5 format ultimately (YYYYMMDDHHmmssSSS), while showing/editing date in user's format
-    (partially done: we use one format for pikaday, and another to actually save the date. still need to change input widget edition handling)
-  FIXME: pikaday cannot detect moment.js
   TODO: use HTML5 "date" (and not "datetime-local") input types if available
   TODO: set field type/flag to "date" to make TW5 render {{!!ourField}} as expected, i.e. like it renders e.g. {{!!created}}
   TODO: use our widget for system date fields (created, modified, ...)
@@ -46,11 +43,37 @@ module-type: widget
     this.domNodes.push(this.editor);
 
     this.onPickerDateSelect = this.onPickerDateSelect.bind(this);
+
+    var langprefix = "$:/languages/".length,
+        lang = $tw.wiki.getTiddlerText("$:/language").substring(langprefix, langprefix + 2);
+    if(lang === "zh") {
+      // TW5 does not use standard codes for Chinese
+      var suffix = $tw.wiki.getTiddlerText("$:/language");
+      suffix = suffix.substring(suffix.length-1);
+      if(suffix === "s") {
+        lang = "zh-cn"; //simplified
+      } else {
+        lang = "zh-tw"; //traditional
+      }
+    }
+
+    var locale = moment.localeData(moment.locale([lang, "en"])),
+        i18n = {
+          previousMonth : "Previous Month",
+          nextMonth     : "Next Month",
+          months        : locale._months,
+          monthsShort   : locale._monthsShort,
+          weekdays      : locale._weekdays,
+          weekdaysShort : locale._weekdaysShort,
+        };
+
     this.picker = new pikaday({
       field: this.editor,
       format: this.editFormat,
-      onSelect: this.onPickerDateSelect
+      onSelect: this.onPickerDateSelect,
+      i18n: i18n,
     });
+
     this.refreshSelf();
   };
 
@@ -87,7 +110,6 @@ module-type: widget
 
   DatePickerWidget.prototype.onPickerDateSelect = function() {
     this.saveChanges(moment(this.picker.toString(), this.editFormat).format(this.saveFormat));
-    // this.picker.setDate(moment(this.editor.value, this.saveFormat).format(this.editFormat));
   };
 
 // ---------------------------------------------------------- //
