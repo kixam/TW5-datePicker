@@ -10,4 +10,5 @@ All attributes are optional.
 |!Attribute|!Purpose|!Default value|
 |`tiddler`|Edited tiddler|//current tiddler//|
 |`field`|Edited field|`created`|
-|`format`|Date format, in [[moment.js|http://momentjs.com]]'s [[parse+string format|http://momentjs.com/docs/#/parsing/string-format/]]|`YYYY-MM-DD`|
+|`format`|Date format as it is shown in input control, in [[moment.js|http://momentjs.com]]'s [[parse+string format|http://momentjs.com/docs/#/parsing/string-format/]]|`YYYY-MM-DD`|
+|`fieldFormat`|Date format used to save into the field, in [[moment.js|http://momentjs.com]]'s [[parse+string format|http://momentjs.com/docs/#/parsing/string-format/]]|`YYYYMMDDHHmmssSSS`|
