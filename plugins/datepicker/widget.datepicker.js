@@ -34,7 +34,6 @@ module-type: widget
     this.renderChildren(parent,nextSibling);
     this.execute();
     this.parentDomNode = parent;
-    this.saveFormat = "YYYYMMDDHHmmssSSS";
 
     // Choose the appropriate edit widget
     this.editor = $tw.utils.domMaker("input", {type: "date"});
@@ -80,6 +79,7 @@ module-type: widget
   DatePickerWidget.prototype.execute = function() {
     // Get our parameters
     this.editFormat = this.getAttribute("format", "YYYY-MM-DD");
+    this.saveFormat = this.getAttribute("fieldFormat", "YYYYMMDDHHmmssSSS");
     this.editTitle = this.getAttribute("tiddler", this.getVariable("currentTiddler"));
     this.editField = this.getAttribute("field","created");
     this.editIndex = this.getAttribute("index");
