@@ -102,14 +102,13 @@ module-type: widget
   DatePickerWidget.prototype.refreshSelf = function() {
     var val = moment(this.getEditInfo().value, this.saveFormat);
     if(val.isValid()) {
-      val = val.format(this.editFormat);
-      this.editor.value = val;
-      this.picker.setDate(val);
+      this.editor.value = val.format(this.editFormat);
+      this.picker.setMoment(val, true);
     }
   }
 
   DatePickerWidget.prototype.onPickerDateSelect = function() {
-    this.saveChanges(moment(this.picker.toString(), this.editFormat).format(this.saveFormat));
+    this.saveChanges(this.picker.toString(this.saveFormat));
   };
 
 // ---------------------------------------------------------- //
