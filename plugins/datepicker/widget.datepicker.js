@@ -69,6 +69,7 @@ module-type: widget
     this.picker = new pikaday({
       field: this.editor,
       format: this.editFormat,
+      firstDay: this.firstDay,
       onSelect: this.onPickerDateSelect,
       i18n: i18n,
     });
@@ -79,6 +80,7 @@ module-type: widget
   DatePickerWidget.prototype.execute = function() {
     // Get our parameters
     this.editFormat = this.getAttribute("format", "YYYY-MM-DD");
+    this.firstDay = parseInt(this.getAttribute("firstDay", "0"));
     this.saveFormat = this.getAttribute("fieldFormat", "YYYYMMDDHHmmssSSS");
     this.editTitle = this.getAttribute("tiddler", this.getVariable("currentTiddler"));
     this.editField = this.getAttribute("field","created");
@@ -102,14 +104,13 @@ module-type: widget
   DatePickerWidget.prototype.refreshSelf = function() {
     var val = moment(this.getEditInfo().value, this.saveFormat);
     if(val.isValid()) {
-      val = val.format(this.editFormat);
-      this.editor.value = val;
-      this.picker.setDate(val);
+      this.editor.value = val.format(this.editFormat);
+      this.picker.setMoment(val, true);
     }
   }
 
   DatePickerWidget.prototype.onPickerDateSelect = function() {
-    this.saveChanges(moment(this.picker.toString(), this.editFormat).format(this.saveFormat));
+    this.saveChanges(this.picker.toString(this.saveFormat));
   };
 
 // ---------------------------------------------------------- //
