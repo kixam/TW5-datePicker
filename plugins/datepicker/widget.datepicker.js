@@ -36,8 +36,13 @@ module-type: widget
     this.parentDomNode = parent;
 
     // Choose the appropriate edit widget
-    this.editor = $tw.utils.domMaker("input", {type: "date"});
+    this.editor = $tw.utils.domMaker("input", {attributes:{type: "date"}});
     this.editorType = this.editor.type;
+
+    if(this.editPlaceholder) {
+      this.editor.setAttribute("placeholder",this.editPlaceholder);
+    }
+
     parent.insertBefore(this.editor, nextSibling);
     this.domNodes.push(this.editor);
 
