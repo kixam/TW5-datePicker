@@ -14,3 +14,5 @@ All attributes are optional.
 |`firstDay`|First day of the week (0: Sunday, 1: Monday, etc.)|`0`|
 |`fieldFormat`|Date format used to save into the field, in [[moment.js|http://momentjs.com]]'s [[parse+string format|http://momentjs.com/docs/#/parsing/string-format/]]|`YYYYMMDDHHmmssSSS`|
 |`placeholder`|Placeholder|//empty//|
+|`tag`|HTML tag to render the editor|`input`|
+|`attributes`|[[JSON Tiddler|http://tiddlywiki.com/#JSONTiddlers]] containing HTML attributes attached to the HTML object used to render the editor, typically `style`|//empty//|

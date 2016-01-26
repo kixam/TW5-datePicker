@@ -35,14 +35,24 @@ module-type: widget
     this.execute();
     this.parentDomNode = parent;
 
-    // Choose the appropriate edit widget
-    this.editor = $tw.utils.domMaker("input", {attributes:{type: "date"}});
-    this.editorType = this.editor.type;
+    // set HTML tag
+    if(!this.editTag || $tw.config.htmlUnsafeElements.indexOf(this.editTag) !== -1) {
+      this.editTag = "input";
+    }
+
+    // set HTML item attributes
+    if(this.editAttributes) {
+      this.editAttributes = $tw.wiki.getTiddlerData(this.editAttributes, {});
+    }
+
+    // create HTML item
+    this.editor = $tw.utils.domMaker(this.editTag, {attributes: this.editAttributes});
 
     if(this.editPlaceholder) {
       this.editor.setAttribute("placeholder",this.editPlaceholder);
     }
 
+    // render HTML item
     parent.insertBefore(this.editor, nextSibling);
     this.domNodes.push(this.editor);
 
@@ -92,6 +102,8 @@ module-type: widget
     this.editIndex = this.getAttribute("index");
     this.editClass = this.getAttribute("class");
     this.editPlaceholder = this.getAttribute("placeholder");
+    this.editTag = this.getAttribute("tag");
+    this.editAttributes = this.getAttribute("attributes");
   };
 
   // Selectively refreshes the widget if needed. Returns true if the widget or any of its children needed re-rendering
