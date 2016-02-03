@@ -21,10 +21,12 @@ module-type: widget
   var Widget = require("$:/core/modules/widgets/widget.js").widget;
   var moment = require("$:/plugins/kixam/moment/moment.js");
   var pikaday = require("$:/plugins/kixam/datepicker/pikaday.js"); // this is a modified version of pikaday.js, see build.sh
+  var image = require("$:/core/modules/widgets/image.js").image;
 
   var DatePickerWidget = function(parseTreeNode, options) {
     Widget.call(this);
     this.initialise(parseTreeNode, options);
+    this.options = options;
   };
 
   DatePickerWidget.prototype = new Widget();
@@ -41,8 +43,8 @@ module-type: widget
     }
 
     // set HTML item attributes
-    if(this.editAttributes) {
-      this.editAttributes = $tw.wiki.getTiddlerData(this.editAttributes, {});
+    if(this.editAttributesTiddlerName) {
+      this.editAttributes = $tw.wiki.getTiddlerData(this.editAttributesTiddlerName, {});
     }
 
     // create HTML item
@@ -55,6 +57,23 @@ module-type: widget
     // render HTML item
     parent.insertBefore(this.editor, nextSibling);
     this.domNodes.push(this.editor);
+
+    // render icon
+    if(this.iconPath) {
+      var tiddler = this.wiki.getTiddler(this.iconPath);
+      if(tiddler && tiddler.hasTag("$:/tags/Image")) {
+        // this is a system icon tiddler: just transclude the tiddler
+        this.icon = $tw.utils.domMaker("span", {innerHTML: tiddler.fields.text});
+        parent.insertBefore(this.icon, this.editor);
+        this.domNodes.push(this.icon);
+      } else {
+        // this is something else: render it using <$image> widget
+        var ptn = this.parseTreeNode;
+        ptn.attributes = {source: {name: "source", type: "string", value: this.iconPath} };
+        this.icon = new image(ptn, this.options);
+        this.icon.render(this.parentDomNode, this.editor);
+      }
+    }
 
     this.onPickerDateSelect = this.onPickerDateSelect.bind(this);
 
@@ -103,7 +122,8 @@ module-type: widget
     this.editClass = this.getAttribute("class");
     this.editPlaceholder = this.getAttribute("placeholder");
     this.editTag = this.getAttribute("tag");
-    this.editAttributes = this.getAttribute("attributes");
+    this.editAttributesTiddlerName = this.getAttribute("attributes");
+    this.iconPath = this.getAttribute("icon");
   };
 
   // Selectively refreshes the widget if needed. Returns true if the widget or any of its children needed re-rendering
