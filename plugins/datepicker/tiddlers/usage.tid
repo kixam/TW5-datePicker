@@ -16,3 +16,4 @@ All attributes are optional.
 |`placeholder`|Placeholder|//empty//|
 |`tag`|HTML tag to render the editor|`input`|
 |`attributes`|[[JSON Tiddler|http://tiddlywiki.com/#JSONTiddlers]] containing HTML attributes attached to the HTML object used to render the editor, typically `style`|//empty//|
+|`icon`|Image tiddler or URL to an image that will be rendered next to the `tag`. When clicked, it will trigger the date picker|//empty//|
