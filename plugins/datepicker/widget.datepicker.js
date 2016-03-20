@@ -3,7 +3,7 @@ title: $:/plugins/kixam/datepicker/widget.datepicker.js
 type: application/javascript
 module-type: widget
 
-  A widget for displaying date pickers using Yet Another DatePicker at http://freqdec.github.io/datePicker/
+  A widget for displaying date pickers using Pikaday at https://github.com/owenmead/Pikaday
 
   For full help see $:/plugins/kixam/datepicker/usage
 
