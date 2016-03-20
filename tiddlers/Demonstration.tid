@@ -1,7 +1,13 @@
 title: Demonstration
 created: 20150712121212000
 
+Using `input` tag and showing time:
+
 <$edit-date showTime showSeconds use24hour/>
+
+Using an icon instead of an `input` field:
+
+<$edit-date icon="$:/core/icon" tag=div />
 
 !!Result:
 {{!!created}}
