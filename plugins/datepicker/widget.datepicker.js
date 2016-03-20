@@ -123,7 +123,7 @@ module-type: widget
     var defaultFormat = "YYYY-MM-DD";
     if(this.showTime) {
       if(this.use24hour) defaultFormat += " HH";
-      else defaultFormat += "hh";
+      else defaultFormat += " hh";
       defaultFormat += ":mm";
       if(this.showSeconds) defaultFormat += ":ss";
     }
