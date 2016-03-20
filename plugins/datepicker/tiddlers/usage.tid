@@ -2,7 +2,7 @@ title: $:/plugins/kixam/datepicker/usage
 
 `<$edit-date>`
 
-This plugin can only pick days, not times.
+This plugin can pick days and times.
 
 !! attributes
 All attributes are optional.
@@ -17,3 +17,6 @@ All attributes are optional.
 |`tag`|HTML tag to render the editor|`input`|
 |`attributes`|[[JSON Tiddler|http://tiddlywiki.com/#JSONTiddlers]] containing HTML attributes attached to the HTML object used to render the editor, typically `style`|//empty//|
 |`icon`|Image tiddler or URL to an image that will be rendered next to the `tag`. When clicked, it will trigger the date picker|//empty//|
+|`showTime`|Show time as well as date|//not set//|
+|`showSeconds`|If `showTime` is set, shows seconds as well|//not set//|
+|`use24hour`|If `showTime` is set, use 24-hour format|//not set//|

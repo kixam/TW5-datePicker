@@ -105,6 +105,9 @@ module-type: widget
       format: this.editFormat,
       firstDay: this.firstDay,
       onSelect: this.onPickerDateSelect,
+      showTime: this.showTime,
+      showSeconds: this.showSeconds,
+      use24hour: this.use24hour,
       i18n: i18n,
     });
 
@@ -124,6 +127,9 @@ module-type: widget
     this.editTag = this.getAttribute("tag");
     this.editAttributesTiddlerName = this.getAttribute("attributes");
     this.iconPath = this.getAttribute("icon");
+    this.showTime = this.getAttribute("showTime");
+    this.showSeconds = this.getAttribute("showSeconds");
+    this.use24hour = this.getAttribute("use24hour");
   };
 
   // Selectively refreshes the widget if needed. Returns true if the widget or any of its children needed re-rendering

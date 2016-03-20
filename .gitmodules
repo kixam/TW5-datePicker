@@ -1,3 +1,3 @@
 [submodule "plugins/datepicker/Pikaday"]
 	path = plugins/datepicker/Pikaday
-	url = https://github.com/dbushell/Pikaday.git
+	url = https://github.com/owenmead/Pikaday.git
