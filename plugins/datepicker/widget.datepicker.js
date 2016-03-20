@@ -102,6 +102,7 @@ module-type: widget
 
     this.picker = new pikaday({
       field: this.editor,
+      trigger: this.icon || this.editor,
       format: this.editFormat,
       firstDay: this.firstDay,
       onSelect: this.onPickerDateSelect,
