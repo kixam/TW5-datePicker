@@ -116,7 +116,18 @@ module-type: widget
 
   DatePickerWidget.prototype.execute = function() {
     // Get our parameters
-    this.editFormat = this.getAttribute("format", "YYYY-MM-DD");
+    this.showTime = this.getAttribute("showTime");
+    this.showSeconds = this.getAttribute("showSeconds");
+    this.use24hour = this.getAttribute("use24hour");
+
+    var defaultFormat = "YYYY-MM-DD";
+    if(this.showTime) {
+      if(this.use24hour) defaultFormat += " HH";
+      else defaultFormat += "hh";
+      defaultFormat += ":mm";
+      if(this.showSeconds) defaultFormat += ":ss";
+    }
+    this.editFormat = this.getAttribute("format", defaultFormat);
     this.firstDay = parseInt(this.getAttribute("firstDay", "0"));
     this.saveFormat = this.getAttribute("fieldFormat", "YYYYMMDDHHmmssSSS");
     this.editTitle = this.getAttribute("tiddler", this.getVariable("currentTiddler"));
@@ -127,9 +138,6 @@ module-type: widget
     this.editTag = this.getAttribute("tag");
     this.editAttributesTiddlerName = this.getAttribute("attributes");
     this.iconPath = this.getAttribute("icon");
-    this.showTime = this.getAttribute("showTime");
-    this.showSeconds = this.getAttribute("showSeconds");
-    this.use24hour = this.getAttribute("use24hour");
   };
 
   // Selectively refreshes the widget if needed. Returns true if the widget or any of its children needed re-rendering
@@ -145,7 +153,7 @@ module-type: widget
   };
 
   DatePickerWidget.prototype.refreshSelf = function() {
-    var val = moment(this.getEditInfo().value, this.saveFormat);
+    var val = moment.utc(this.getEditInfo().value, this.saveFormat);
     if(val.isValid()) {
       this.editor.value = val.format(this.editFormat);
       this.picker.setMoment(val, true);
@@ -153,7 +161,8 @@ module-type: widget
   }
 
   DatePickerWidget.prototype.onPickerDateSelect = function() {
-    this.saveChanges(this.picker.toString(this.saveFormat));
+    this.saveChanges(this.picker.getMoment().utc().format(this.saveFormat));
+    $tw.rootWidget.dispatchEvent({type: "tm-auto-save-wiki"});
   };
 
 // ---------------------------------------------------------- //
