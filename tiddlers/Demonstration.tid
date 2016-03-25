@@ -7,7 +7,7 @@ Using `input` tag and showing time:
 
 Using an icon instead of an `input` field:
 
-<$edit-date icon="$:/core/icon" tag=div />
+<$edit-date icon="$:/plugins/kixam/datepicker/icon" tag=div />
 
 !!Result:
 {{!!created}}
