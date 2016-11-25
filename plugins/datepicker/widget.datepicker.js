@@ -162,7 +162,9 @@ module-type: widget
   }
 
   DatePickerWidget.prototype.onPickerDateSelect = function() {
-    this.saveChanges(this.picker.getMoment().utc().format(this.saveFormat));
+    var val = this.picker.getMoment();
+    if(this.showTime) val = val.utc();
+    this.saveChanges(val.format(this.saveFormat));
     $tw.rootWidget.dispatchEvent({type: "tm-auto-save-wiki"});
   };
 
