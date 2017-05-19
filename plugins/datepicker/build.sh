@@ -17,6 +17,12 @@ targetjs="pikaday.js"                      # target javascript file name
 #####################################################################
 
 #====================================================================
+printf "Fetch upstream resources...\n"
+#====================================================================
+
+git submodule update --recursive --remote
+
+#====================================================================
 printf "Perform cleanup...\n"
 #====================================================================
 
@@ -81,6 +87,16 @@ body=$(uglifyjs $distPath/$targetjs --comments < /dev/null)
 #body=$(cat $distPath/$targetjs) # uncomment for no compression
 
 printf "%s\n\n%s\n" "$header" "$body" > $distPath/$targetjs
+
+#====================================================================
+printf "update version information...\n"
+#====================================================================
+
+version="$(cd "$srcPath" && git describe --tags $(git rev-list --tags --max-count=1))"
+printf "using Pikaday.js version $version\n"
+
+expr="s/Pikaday version[^\"]*\"/Pikaday version $version\"/g"
+sed -i -r -e "$expr" "plugin.info"
 
 #====================================================================
 printf "copy to final directory...\n"
