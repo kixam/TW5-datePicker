@@ -1,6 +1,6 @@
 {
   "title": "$:/plugins/kixam/datepicker",
-  "description": "datepicker plugin for TiddlyWiki5",
+  "description": "datepicker plugin for TiddlyWiki5, based on Pikaday version 1.5.1",
   "author": "kixam",
   "version": "0.5.2",
   "core-version": ">=5.1.8",
