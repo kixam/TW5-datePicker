@@ -4,7 +4,7 @@
   "author": "kixam",
   "version": "0.5.2",
   "core-version": ">=5.1.8",
-  "source": "https://github.com/kixam/TW5-datepicker.js",
+  "source": "https://github.com/kixam/TW5-datepicker",
   "list": "readme license usage",
   "plugin-type": "plugin"
 }
