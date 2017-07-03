@@ -54,6 +54,10 @@ module-type: widget
       this.editor.setAttribute("placeholder",this.editPlaceholder);
     }
 
+    if(this.editClass) {
+      this.editor.setAttribute("class",this.editClass);
+    }
+
     // render HTML item
     parent.insertBefore(this.editor, nextSibling);
     this.domNodes.push(this.editor);
