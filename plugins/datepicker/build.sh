@@ -20,7 +20,7 @@ targetjs="pikaday.js"                      # target javascript file name
 printf "Fetch upstream resources...\n"
 #====================================================================
 
-git submodule update --recursive --remote
+git submodule update --init --recursive --remote
 
 #====================================================================
 printf "Perform cleanup...\n"
