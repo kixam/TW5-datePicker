@@ -1,0 +1,32 @@
+{
+  "tiddlers": [
+    {
+      "file": "media/icon.tid",
+      "isTiddlerFile": "true"
+    },
+    {
+      "file": "tiddlers/license.tid",
+	  "isTiddlerFile": "true"
+    },
+    {
+      "file": "tiddlers/pikaday.css.tid",
+	  "isTiddlerFile": "true"
+    },
+    {
+      "file": "pikaday.js",
+	  "isTiddlerFile": "true"
+    },
+    {
+      "file": "tiddlers/readme.tid",
+	  "isTiddlerFile": "true"
+    },
+    {
+      "file": "tiddlers/usage.tid",
+	  "isTiddlerFile": "true"
+    },
+    {
+      "file": "widget.datepicker.js",
+	  "isTiddlerFile": "true"
+    }
+  ]
+}
