@@ -6,11 +6,12 @@
 # Script Configuration
 #####################################################################
 
-pluginPrefix="$:/plugins/kixam/datepicker" # prefix for all tiddlers of this plugin
-distPath="temp"                            # output path
-srcPath="Pikaday"                          # input path
-targetPath="."                             # target path
-targetjs="pikaday.js"                      # target javascript file name
+pluginPrefix="$:/plugins/kixam/datepicker"       # prefix for all tiddlers of this plugin
+srcPath="Pikaday"                                # input path
+srcjs="$srcPath/pikaday.js"                      # source javascript file name
+targetPath="plugins/datepicker"                  # target path
+targetjs="$targetPath/pikaday.js"                # target javascript file name
+targetcss="$targetPath/tiddlers/pikaday.css.tid" # target css file name
 
 #####################################################################
 # Program
@@ -27,11 +28,7 @@ printf "Perform cleanup...\n"
 #====================================================================
 
 # clean up
-[ -d $distPath ] && rm -rf $distPath
-
-# create paths
-mkdir -p $distPath
-mkdir $distPath/tiddlers
+rm -f "$targetjs" "$targetcss"
 
 #====================================================================
 printf "minify and copy styles...\n"
@@ -46,7 +43,7 @@ tags: $:/tags/Stylesheet'
 # uglifyied content; redirect stdin so its not closed by npm command
 body=$(uglifycss $srcPath/css/pikaday.css < /dev/null)
 
-printf "%s\n\n%s" "$header" "$body" > $distPath/tiddlers/pikaday.css.tid
+printf "%s\n\n%s" "$header" "$body" > $targetcss
 
 #====================================================================
 printf "uglify and copy scripts...\n"
@@ -55,7 +52,7 @@ printf "uglify and copy scripts...\n"
 # header with macro
 header=\
 '/*\
-title: '${pluginPrefix}/$targetjs'
+title: '${pluginPrefix}/pikaday.js'
 type: application/javascript
 module-type: library
 
@@ -64,29 +61,29 @@ module-type: library
 
 # remove root references to window object
 while IFS='' read -r line || [[ -n $line ]]; do
-  if [[ "$line" =~ ^.*hasEventListeners\ =\ !!window\.addEventListener,.*$  \
+  if [[ "$line" =~ ^.*hasEventListeners\ =\ !!window\.addEventListener,.*$ \
      || "$line" =~ ^.*document\ =\ window.document,.*$ \
      || "$line" =~ ^.*sto\ =\ window.setTimeout,.*$ ]]
   then
     printf "<line removed: %s>\n" "$line"
   elif [[ "$line" =~ ^(.*)hasEventListeners(.*)$ ]] ; then
-    echo "${BASH_REMATCH[1]}!!window.addEventListener${BASH_REMATCH[2]}" >> $distPath/$targetjs
+    echo "${BASH_REMATCH[1]}!!window.addEventListener${BASH_REMATCH[2]}" >> "$targetjs"
   elif [[ "$line" =~ ^(.*)\ document\.(.*)$ ]] ; then
-    echo "${BASH_REMATCH[1]} window.document.${BASH_REMATCH[2]}" >> $distPath/$targetjs
+    echo "${BASH_REMATCH[1]} window.document.${BASH_REMATCH[2]}" >> "$targetjs"
   elif [[ "$line" =~ ^(.*)sto\((.*)$ ]] ; then
-    echo "${BASH_REMATCH[1]}window.setTimeout(${BASH_REMATCH[2]}" >> $distPath/$targetjs
+    echo "${BASH_REMATCH[1]}window.setTimeout(${BASH_REMATCH[2]}" >> "$targetjs"
   elif [[ "$line" =~ ^(.*)require\(\'moment(.*)$ ]] ; then
-    echo "${BASH_REMATCH[1]}require('$:/plugins/kixam/moment/moment.js${BASH_REMATCH[2]}" >> $distPath/$targetjs
+    echo "${BASH_REMATCH[1]}require('$:/plugins/kixam/moment/moment.js${BASH_REMATCH[2]}" >> "$targetjs"
   else
-    echo "$line" >> $distPath/$targetjs
+    echo "$line" >> "$targetjs"
   fi
-done < $srcPath/$targetjs
+done < "$srcjs"
 
 # uglifyied content; redirect stdin so its not closed by npm command
-body=$(uglifyjs $distPath/$targetjs --comments < /dev/null)
-#body=$(cat $distPath/$targetjs) # uncomment for no compression
+body=$(uglifyjs $targetjs --comments < /dev/null)
+#body=$(cat $targetjs) # uncomment for no compression
 
-printf "%s\n\n%s\n" "$header" "$body" > $distPath/$targetjs
+printf "%s\n\n%s\n" "$header" "$body" > "$targetjs"
 
 #====================================================================
 printf "update version information...\n"
@@ -96,13 +93,6 @@ version="$(cd "$srcPath" && git describe --tags $(git rev-list --tags --max-coun
 printf "using Pikaday.js version $version\n"
 
 expr="s/Pikaday version[^\"]*\"/Pikaday version $version\"/g"
-sed -i -r -e "$expr" "plugin.info"
-
-#====================================================================
-printf "copy to final directory...\n"
-#====================================================================
-
-cp -r $distPath/tiddlers/* $targetPath/tiddlers/
-cp -r $distPath/*.js $targetPath/
+sed -i -r -e "$expr" "$targetPath/plugin.info"
 
 exit
