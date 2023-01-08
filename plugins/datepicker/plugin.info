@@ -6,6 +6,6 @@
   "core-version": ">=5.1.8",
   "source": "https://github.com/kixam/TW5-datepicker.js",
   "list": "readme license usage",
-  "depends": ["$:/plugins/kixam/moment"],
+  "dependents": ["$:/plugins/kixam/moment"],
   "plugin-type": "plugin"
 }
