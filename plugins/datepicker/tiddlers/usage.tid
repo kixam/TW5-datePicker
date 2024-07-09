@@ -1,8 +1,13 @@
 title: $:/plugins/kixam/datepicker/usage
 
-`<$edit-date>`
+`<$edit-date/>`
 
-This plugin can pick days and times.
+This plugin can pick days and times. Upon selection of a date, the following can optionally be performed
+
+* Execute any [[ActionWidgets|http://tiddlywiki.com/#ActionWidgets]] passed in the `actions` attribute
+* Execute any [[ActionWidgets|http://tiddlywiki.com/#ActionWidgets]] that are immediate children of the datepicker widget
+* Dispatch a user defined [[widget message|https://tiddlywiki.com/#Messages]]
+
 
 !! attributes
 All attributes are optional.
@@ -15,8 +20,40 @@ All attributes are optional.
 |`fieldFormat`|Date format used to save into the field, in [[moment.js|http://momentjs.com]]'s [[parse+string format|http://momentjs.com/docs/#/parsing/string-format/]]|`YYYYMMDDHHmmssSSS`|
 |`placeholder`|Placeholder|//empty//|
 |`tag`|HTML tag to render the editor|`input`|
+|`index`|The index to edit|//empty//|
+|`class`|A CSS class to be assigned to the generated HTML editing element|
 |`attributes`|[[JSON Tiddler|http://tiddlywiki.com/#JSONTiddlers]] containing HTML attributes attached to the HTML object used to render the editor, typically `style`|//empty//|
 |`icon`|Image tiddler or URL to an image that will be rendered next to the `tag`. When clicked, it will trigger the date picker|//empty//|
 |`showTime`|Show time as well as date|//not set//|
 |`showSeconds`|If `showTime` is set, shows seconds as well|//not set//|
 |`use24hour`|If `showTime` is set, use 24-hour format|//not set//|
+|`actions`|A string containing [[ActionWidgets|http://tiddlywiki.com/#ActionWidgets]] to be triggered when the key combination is detected|//not set//|
+|`message`|The name of the [[widget message|https://tiddlywiki.com/#Messages]] to send when the button is clicked|//not set//|
+|`param`|The optional parameter to the message|//not set//|
+|`defaultDate`|The date to use by default|//today//|
+
+!! Additional filters
+
+This plugin also provides with the following additional filter operators
+
+* `field.earlier[date]` : select tiddlers with a specified date field that shows a value earlier or equal to a given date
+* `field.later[date]` : select tiddlers with a specified date field that shows a value later or equal to a given date
+* `isweek[week]` : filter out inputs that are not dates or do not match given week number
+* `isweekyear[year]` : filter out inputs that are not dates or do not match given week year
+* `datesubtract[date]` : subtract input date by date given as parameter
+
+!! Additional macros
+
+This plugin also provides with the following additional macros
+
+* `<<age birthday:"2015-07-12">>` : returns the current age of a person, given their `birthday` (in a date format understoood by native Javascript `Date` constructor)
+* `<<duration text:"1234" precision:"d">>` : given a duration in a floating number of minutes, returns a text giving the duration in days, hours, or minutes depending on whether `precision` value is "d", "h", or "m", respectively (defaults to "d")
+* `<<parsedate text:"now" format:"YYYY-0MM-0DD">>` : best effort to parse a `text` to a date. The output `format` is interpreted as [[DateFormat|https://tiddlywiki.com/#DateFormat]]
+
+!! Tweaks
+
+* If an ISO date prefixed with '@' is found, e.g. `@2022-05-10`, a link to a tiddler with this ISO date as target, and corresponding full date as text, will be displayed instead
+* The "New Journal" button will implicitly create two additional levels of tags. Typically, the new journal tiddler will be named as a date `YYYY-0MM-0DD`; it will be tagged with the corresponding month `YYYY-0MM`, which will in turn be tagged with the corresponding year `YYYY`; this last tiddler will be tagged with tags set for Journal entries
+* Tiddlers which `title` field is formatted `YYYY-0MM-0DD` and `YYYY-0MM` will be displayed using full date and full month formats, respectively 
+* When editing a Journal tiddler, i.e. a tiddler which `title` field is formatted using Journal title format as set in the parameters, the title editor will be a date picker
+* A button to insert a date was added into the editor toolbar

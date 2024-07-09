@@ -1,0 +1,8 @@
+title: $:/plugins/kixam/datepicker/ui/EditorToolbar/datepicker-dropdown
+caption: date
+condition: [<targetTiddler>!is[image]]
+description: insert a date
+dropdown: $:/plugins/kixam/datepicker/ui/EditorToolbar/datepicker
+
+
+* tags: $:/tags/EditorToolbar

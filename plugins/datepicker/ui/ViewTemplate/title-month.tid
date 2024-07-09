@@ -1,0 +1,9 @@
+title: $:/plugins/kixam/datepicker/ui/ViewTemplate/title/month
+
+\define get-text() $(currentTiddler)$-01
+\whitespace trim
+<h2 class="tc-title">
+<$set name="template" value={{$:/config/plugins/kixam/datepicker/FullMonthFormat}}>
+<$macrocall $name="parsedate" text=<<get-text>> format=<<template>>/>
+</$set>
+</h2>

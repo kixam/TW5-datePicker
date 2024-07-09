@@ -1,0 +1,8 @@
+title: $:/plugins/kixam/datepicker/ui/ViewTemplate/title/date
+
+\whitespace trim
+<h2 class="tc-title">
+<$set name="template" value={{$:/config/plugins/kixam/datepicker/FullDateFormat}}>
+<$macrocall $name="parsedate" text=<<currentTiddler>> format=<<template>>/>
+</$set>
+</h2>

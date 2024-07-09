@@ -3,7 +3,7 @@ title: $:/plugins/kixam/datepicker/widget.datepicker.js
 type: application/javascript
 module-type: widget
 
-  A widget for displaying date pickers using Yet Another DatePicker at http://freqdec.github.io/datePicker/
+  A widget for displaying date pickers using Pikaday at https://github.com/owenmead/Pikaday
 
   For full help see $:/plugins/kixam/datepicker/usage
 
@@ -20,7 +20,7 @@ module-type: widget
 
   var Widget = require("$:/core/modules/widgets/widget.js").widget;
   var moment = require("$:/plugins/kixam/moment/moment.js");
-  var pikaday = require("$:/plugins/kixam/datepicker/pikaday.js"); // this is a modified version of pikaday.js, see build.sh
+  var pikaday = require("$:/plugins/kixam/datepicker/pikaday.js"); // this is a modified version of pikaday.js, see build-plugin.sh
   var image = require("$:/core/modules/widgets/image.js").image;
 
   var DatePickerWidget = function(parseTreeNode, options) {
@@ -31,7 +31,59 @@ module-type: widget
 
   DatePickerWidget.prototype = new Widget();
 
+  DatePickerWidget.prototype.execute = function() {
+    // Get our parameters
+    this.showTime = this.getAttribute("showTime");
+    this.showSeconds = this.getAttribute("showSeconds");
+    this.use24hour = this.getAttribute("use24hour");
+
+    var defaultFormat = "YYYY-MM-DD";
+    if(this.showTime) {
+      if(this.use24hour) defaultFormat += " HH";
+      else defaultFormat += " hh";
+      defaultFormat += ":mm";
+      if(this.showSeconds) defaultFormat += ":ss";
+    }
+    this.editFormat = this.getAttribute("format", defaultFormat);
+    this.firstDay = parseInt(this.getAttribute("firstDay", "0"));
+    this.saveFormat = this.getAttribute("fieldFormat", "YYYYMMDDHHmmssSSS");
+    this.editTitle = this.getAttribute("tiddler", this.getVariable("currentTiddler"));
+    this.editField = this.getAttribute("field","created");
+    this.editIndex = this.getAttribute("index");
+    this.editClass = this.getAttribute("class");
+    this.editPlaceholder = this.getAttribute("placeholder");
+    this.editTag = this.getAttribute("tag");
+    this.editAttributesTiddlerName = this.getAttribute("attributes");
+    this.iconPath = this.getAttribute("icon");
+    this.actions = this.getAttribute("actions");
+    this.message = this.getAttribute("message");
+    this.param = this.getAttribute("param");
+    this.defaultDate = this.getAttribute("defaultDate");
+  };
+
+  // Selectively refreshes the widget if needed. Returns true if the widget or any of its children needed re-rendering
+  DatePickerWidget.prototype.refresh = function(changedTiddlers) {
+    var changedAttributes = this.computeAttributes();
+    // Refresh if an attribute has changed, or the type associated with the target tiddler has changed
+    if(changedAttributes.tiddler || changedAttributes.field || changedAttributes.index || changedTiddlers[this.editTitle]) {
+      this.refreshSelf();
+      return true;
+    } else {
+      return this.refreshChildren(changedTiddlers);
+    }
+  };
+
+  DatePickerWidget.prototype.refreshSelf = function() {
+    var val = moment.utc(this.getEditInfo().value, this.saveFormat);
+    if(val.isValid()) {
+      this.editor.value = val.format(this.editFormat);
+      this.picker.setMoment(val, true);
+    }
+  };
+
   DatePickerWidget.prototype.render = function(parent,nextSibling) {
+    var self = this;
+
     this.computeAttributes();
     this.renderChildren(parent,nextSibling);
     this.execute();
@@ -60,6 +112,7 @@ module-type: widget
 
     // render HTML item
     parent.insertBefore(this.editor, nextSibling);
+    this.renderChildren(this.editor, null);
     this.domNodes.push(this.editor);
 
     // render icon
@@ -79,14 +132,11 @@ module-type: widget
       }
     }
 
-    this.onPickerDateSelect = this.onPickerDateSelect.bind(this);
-
     var langprefix = "$:/languages/".length,
         lang = $tw.wiki.getTiddlerText("$:/language").substring(langprefix, langprefix + 2);
     if(lang === "zh") {
       // TW5 does not use standard codes for Chinese
-      var suffix = $tw.wiki.getTiddlerText("$:/language");
-      suffix = suffix.substring(suffix.length-1);
+      var suffix = $tw.wiki.getTiddlerText("$:/language").substring(suffix.length-1);
       if(suffix === "s") {
         lang = "zh-cn"; //simplified
       } else {
@@ -109,67 +159,46 @@ module-type: widget
       trigger: this.icon || this.editor,
       format: this.editFormat,
       firstDay: this.firstDay,
-      onSelect: this.onPickerDateSelect,
       showTime: this.showTime,
       showSeconds: this.showSeconds,
       use24hour: this.use24hour,
       i18n: i18n,
+      defaultDate: (this.defaultDate ? moment(this.defaultDate).toDate() : new Date()),
+      setDefaultDate: (this.defaultDate !== undefined),
+// ---------------------------------------------------------- //
+// ---  inspired from $:/core/modules/widgets/button.js   --- //
+// ---------------------------------------------------------- //
+      onSelect: function(event) {
+        var val = self.picker.getMoment();
+        if(self.showTime) val = val.utc();
+        self.saveChanges(val.format(self.saveFormat));
+        self.dispatchEvent({type: "tm-auto-save-wiki"});
+        
+        var handled = false;
+        if(self.invokeActions(self,event)) {
+          handled = true;
+        }
+        if(self.message) {
+          self.dispatchMessage(event);
+          handled = true;
+        }
+        if(self.actions) {
+          var modifierKey = $tw.keyboardManager.getEventModifierKeyDescriptor(event);
+          self.invokeActionString(self.actions,self,event,{modifier: modifierKey});
+        }
+        if(handled) {
+          event.preventDefault();
+          event.stopPropagation();
+        }
+        return handled;
+      },
     });
 
     this.refreshSelf();
   };
 
-  DatePickerWidget.prototype.execute = function() {
-    // Get our parameters
-    this.showTime = this.getAttribute("showTime");
-    this.showSeconds = this.getAttribute("showSeconds");
-    this.use24hour = this.getAttribute("use24hour");
-
-    var defaultFormat = "YYYY-MM-DD";
-    if(this.showTime) {
-      if(this.use24hour) defaultFormat += " HH";
-      else defaultFormat += " hh";
-      defaultFormat += ":mm";
-      if(this.showSeconds) defaultFormat += ":ss";
-    }
-    this.editFormat = this.getAttribute("format", defaultFormat);
-    this.firstDay = parseInt(this.getAttribute("firstDay", "0"));
-    this.saveFormat = this.getAttribute("fieldFormat", "YYYYMMDDHHmmssSSS");
-    this.editTitle = this.getAttribute("tiddler", this.getVariable("currentTiddler"));
-    this.editField = this.getAttribute("field","created");
-    this.editIndex = this.getAttribute("index");
-    this.editClass = this.getAttribute("class");
-    this.editPlaceholder = this.getAttribute("placeholder");
-    this.editTag = this.getAttribute("tag");
-    this.editAttributesTiddlerName = this.getAttribute("attributes");
-    this.iconPath = this.getAttribute("icon");
-  };
-
-  // Selectively refreshes the widget if needed. Returns true if the widget or any of its children needed re-rendering
-  DatePickerWidget.prototype.refresh = function(changedTiddlers) {
-    var changedAttributes = this.computeAttributes();
-    // Refresh if an attribute has changed, or the type associated with the target tiddler has changed
-    if(changedAttributes.tiddler || changedAttributes.field || changedAttributes.index || changedTiddlers[this.editTitle]) {
-      this.refreshSelf();
-      return true;
-    } else {
-      return this.refreshChildren(changedTiddlers);
-    }
-  };
-
-  DatePickerWidget.prototype.refreshSelf = function() {
-    var val = moment.utc(this.getEditInfo().value, this.saveFormat);
-    if(val.isValid()) {
-      this.editor.value = val.format(this.editFormat);
-      this.picker.setMoment(val, true);
-    }
-  }
-
-  DatePickerWidget.prototype.onPickerDateSelect = function() {
-    var val = this.picker.getMoment();
-    if(this.showTime) val = val.utc();
-    this.saveChanges(val.format(this.saveFormat));
-    $tw.rootWidget.dispatchEvent({type: "tm-auto-save-wiki"});
+  DatePickerWidget.prototype.dispatchMessage = function(event) {
+    this.dispatchEvent({type: this.message, param: this.param, tiddlerTitle: this.getVariable("currentTiddler"), event: event});
   };
 
 // ---------------------------------------------------------- //

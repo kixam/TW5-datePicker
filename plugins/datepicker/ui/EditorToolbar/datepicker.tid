@@ -1,0 +1,13 @@
+caption: date
+condition: [<targetTiddler>!is[image]]
+description: insert a date
+tags: $:/tags/EditorToolbar
+title: $:/plugins/kixam/datepicker/ui/EditorToolbar/datepicker
+
+<$edit-date field="insertdate" icon="$:/plugins/kixam/datepicker/icon" tag=div>
+<$action-sendmessage
+  $message="tm-edit-text-operation"
+  $param="replace-selection"
+  text="TEST TEST"
+/>
+</$edit-date>
