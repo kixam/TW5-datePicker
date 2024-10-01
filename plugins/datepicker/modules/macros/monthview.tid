@@ -1,0 +1,28 @@
+title: $:/plugins/kixam/datepicker/modules/macros/monthview
+tags: $:/tags/Macro
+
+\define monthtab()
+<table>
+<thead><tr>
+<$list filter="[all[shadows]prefix[$:/language/Date/Long/Day/]get[text]]" variable="dayname">
+<th width="14%"><<dayname>></th>
+</$list>
+</tr></thead>
+<tbody style="text-align:center">
+<$list filter="[<yearmonth>compare:string:eq[now]] ~[<yearmonth>addsuffix[-01]]" variable=monthfirstday>
+<$wikify name=firstweekday text="""<$macrocall $name=parsedate text=<<monthfirstday>> format="dddd"/>""">
+<$wikify name=monthlastday text="""<$macrocall $name=monthlastday yearmonth=$(yearmonth)$/>""">
+<$list filter="[range[6]]" variable=row><tr>
+<$list filter="[range:1[7]]" variable=col><td>
+<$list filter="0 [<row>subtract[1]multiply[7]add<col>subtract<firstweekday>] +[maxall[]!match[0]subtract[1]] [<monthlastday>] +[minall[]!match<monthlastday>add[1]pad[2],[0]]" variable=day>
+<$list filter="[<yearmonth>addsuffix[-]addsuffix<day>]" variable=monthday>
+<$link to=<<monthday>>><<day>></$link>
+</$list></$list>
+</td></$list>
+</tr></$list>
+</$wikify>
+</$wikify>
+</$list>
+</tbody>
+</table>
+\end

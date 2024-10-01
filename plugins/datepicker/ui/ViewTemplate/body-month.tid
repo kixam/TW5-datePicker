@@ -1,29 +1,6 @@
 title:$:/plugins/kixam/datepicker/ui/ViewTemplate/month
 tags:$:/tags/ViewTemplate
 
-<$list filter="[all[current]tags[]tag[Journal]then<currentTiddler>]" variable=month>
-<$list filter="[<month>addsuffix[-31]]" variable=maxmonthday>
-<$wikify name=diff text="""<$macrocall $name=parsedate text=<<maxmonthday>> format="DD"/>""">
-<$list filter="[[31]compare:integer:eq<diff>] [[31]subtract<diff>] +[maxall[]]" variable=lastmonthday>
-<table>
-<thead><tr>
-<$list filter="[all[shadows]prefix[$:/language/Date/Long/Day/]get[text]]" variable="day">
-<th width="14%"><<day>></th>
+<$list filter="[all[current]tags[]tag[Journal]then<currentTiddler>]" variable=yearmonth>
+<<monthtab>>
 </$list>
-</tr></thead>
-<tbody style="text-align:center">
-<$list filter="[<month>addsuffix[-01]]" variable=firstmonthday>
-<$wikify name=firstweekday text="""<$macrocall $name=parsedate text=<<firstmonthday>> format="dddd"/>""">
-<$list filter="[range[6]]" variable=row><tr>
-<$list filter="[range:1[7]]" variable=col><td>
-<$list filter="0 [<row>subtract[1]multiply[7]add<col>subtract<firstweekday>] +[maxall[]!match[0]subtract[1]] [<lastmonthday>] +[minall[]!match<lastmonthday>add[1]pad[2],[0]]" variable=day>
-<$list filter="[<month>addsuffix[-]addsuffix<day>]" variable=monthday>
-<$link to=<<monthday>>><<day>></$link>
-</$list></$list>
-</td></$list>
-</tr></$list>
-</$wikify>
-</$list>
-</tbody>
-</table>
-</$list></$wikify></$list></$list>
