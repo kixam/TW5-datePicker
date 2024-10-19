@@ -1,6 +1,6 @@
 title:$:/plugins/kixam/datepicker/ui/ViewTemplate/month
 tags:$:/tags/ViewTemplate
 
-<$list filter="[all[current]tags[]tag[Journal]then<currentTiddler>]" variable=yearmonth>
+<$list filter="[all[current]tags[]tag{$:/config/NewJournal/Tags}then<currentTiddler>]" variable=yearmonth>
 <<monthtab>>
 </$list>

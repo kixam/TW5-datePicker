@@ -2,4 +2,4 @@ title: $:/config/ViewTemplateTitleFilters/month
 tags: $:/tags/ViewTemplateTitleFilter
 list-before: $:/config/ViewTemplateTitleFilters/default
 
-[tags[]tag[Journal]then[$:/plugins/kixam/datepicker/ui/ViewTemplate/title/month]]
+[tags[]tag{$:/config/NewJournal/Tags}then[$:/plugins/kixam/datepicker/ui/ViewTemplate/title/month]]

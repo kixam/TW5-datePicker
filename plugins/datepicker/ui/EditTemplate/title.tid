@@ -1,11 +1,11 @@
 title: $:/core/ui/EditTemplate/title
 tags: $:/tags/EditTemplate
 
-<$list filter="[all[current]tags[]tags[]tag[Journal]]" variable=foo>
+<$list filter="[all[current]tags[]tags[]tag{$:/config/NewJournal/Tags}]" variable=foo>
 <$edit-date field="draft.title" fieldFormat="YYYY-MM-DD" class="tc-titlebar tc-edit-texteditor"/>
 </$list>
 
-<$list filter="[all[current]tags[]tags[]tag[Journal]then[hide]else[show]] -hide" variable=foo>
+<$list filter="[all[current]tags[]tags[]tag{$:/config/NewJournal/Tags}then[hide]else[show]] -hide" variable=foo>
 <$edit-text field="draft.title" class="tc-titlebar tc-edit-texteditor" focus={{{ [{$:/config/AutoFocus}match[title]then[true]] ~[[false]] }}} tabindex={{$:/config/EditTabIndex}} cancelPopups="yes"/>
 </$list>
 
